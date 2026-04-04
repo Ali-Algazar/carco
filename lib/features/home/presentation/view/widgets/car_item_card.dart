@@ -1,4 +1,5 @@
 import 'package:carco/features/car_details/presentation/view/car_details_view.dart';
+import 'package:carco/features/home/presentation/view/admin_car_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:carco/core/extensions/extensions.dart';
 import 'package:carco/core/utils/app_text_styles.dart';
@@ -22,12 +23,21 @@ class _CarItemCardState extends State<CarItemCard> {
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CarDetailsView(carId: widget.car.id),
-          ),
-        );
+        if (widget.car.isAdmin) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AdminCarDetailsView(car: widget.car),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CarDetailsView(carId: widget.car.id),
+            ),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(20),
       child: Container(

@@ -13,19 +13,30 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
 
   @override
   Future<HomeCustomerModel> getHomeData() async {
-    final response = await apiHelper.get(
+    final userCarsFuture = apiHelper.get(
       '/carsuser/all-for-sale',
       requiresAuth: false,
     );
+    final adminCarsFuture = apiHelper.get('/cars', requiresAuth: false);
 
-    List<dynamic> data = response.data;
+    final responses = await Future.wait([userCarsFuture, adminCarsFuture]);
 
-    List<CarModel> apiCars = data
-        .map((json) => CarModel.fromJson(json))
+    List<dynamic> userData = responses[0].data;
+    List<CarModel> userCars = userData
+        .map((json) => CarModel.fromJson(json, isAdmin: false))
+        .toList();
+
+    List<dynamic> adminData = responses[1].data['cars'] ?? [];
+    List<CarModel> adminCars = adminData
+        .map((json) => CarModel.fromJson(json, isAdmin: true))
         .toList();
 
     List<String> categories = ["الكل", "للبيع", "للإيجار"];
 
-    return HomeCustomerModel(categories: categories, featuredCars: apiCars);
+    return HomeCustomerModel(
+      categories: categories,
+      featuredCars: userCars,
+      showroomCars: adminCars, // 👈 تمرير عربيات المعرض مفصولة
+    );
   }
 }

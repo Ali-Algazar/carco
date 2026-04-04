@@ -27,17 +27,24 @@ class _HomeViewBodyState extends State<HomeViewBody> {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
         if (state is HomeLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+          );
         } else if (state is HomeLoaded) {
-          List<CarModel> allCars = state.homeData.featuredCars;
-          List<CarModel> displayedCars = [];
+          List<CarModel> showroomCars = state.homeData.showroomCars;
+          List<CarModel> userCars = state.homeData.featuredCars;
+          List<CarModel> displayedUserCars = [];
 
           if (_selectedCategoryIndex == 0) {
-            displayedCars = allCars;
+            displayedUserCars = userCars;
           } else if (_selectedCategoryIndex == 1) {
-            displayedCars = allCars.where((car) => car.type == 'Sale').toList();
+            displayedUserCars = userCars
+                .where((car) => car.type == 'Sale')
+                .toList();
           } else if (_selectedCategoryIndex == 2) {
-            displayedCars = allCars.where((car) => car.type == 'Rent').toList();
+            displayedUserCars = userCars
+                .where((car) => car.type == 'Rent')
+                .toList();
           }
 
           return SingleChildScrollView(
@@ -48,7 +55,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                 Row(
                   children: [
                     Image.asset('assets/images/CarCo-h.png', height: 30),
-                    Spacer(),
+                    const Spacer(),
                     InkWell(
                       onTap: () {
                         Navigator.pushNamed(
@@ -59,14 +66,14 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          Icon(Icons.notifications_none, size: 28),
+                          const Icon(Icons.notifications_none, size: 28),
                           Positioned(
                             right: -2,
                             top: -2,
                             child: Container(
                               width: 6,
                               height: 6,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.red,
                               ),
@@ -84,7 +91,42 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                 ),
                 24.h,
                 const HomeBanner(),
+
+                if (showroomCars.isNotEmpty) ...[
+                  24.h,
+                  Text(
+                    'أحدث سيارات المعرض',
+                    style: AppTextStyles.textStyle18.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  16.h,
+                  SizedBox(
+                    height: 250,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: showroomCars.length,
+                      separatorBuilder: (context, index) => 16.w,
+                      itemBuilder: (context, index) {
+                        return SizedBox(
+                          width: 180,
+                          child: CarItemCard(car: showroomCars[index]),
+                        );
+                      },
+                    ),
+                  ),
+                  24.h,
+                  const Divider(color: Color(0xFFE0E1DD)),
+                ],
+
                 24.h,
+                Text(
+                  'إعلانات المستخدمين',
+                  style: AppTextStyles.textStyle18.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                16.h,
                 CategoriesSection(
                   categories: _categories,
                   selectedIndex: _selectedCategoryIndex,
@@ -94,16 +136,8 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                     });
                   },
                 ),
-
-                32.h,
-                Text(
-                  'سيارات مميزة',
-                  style: AppTextStyles.textStyle18.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 16.h,
-                displayedCars.isEmpty
+                displayedUserCars.isEmpty
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(24.0),
@@ -113,7 +147,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                     : GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: displayedCars.length,
+                        itemCount: displayedUserCars.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
@@ -122,7 +156,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                               childAspectRatio: 0.75,
                             ),
                         itemBuilder: (context, index) {
-                          return CarItemCard(car: displayedCars[index]);
+                          return CarItemCard(car: displayedUserCars[index]);
                         },
                       ),
                 24.h,

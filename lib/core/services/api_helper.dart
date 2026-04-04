@@ -4,7 +4,7 @@ import '../helper/shared_preferences_service.dart';
 
 class ApiHelper {
   Dio dio;
-  final String baseUrl = 'https://carco1-production.up.railway.app/api';
+  final String baseUrl = 'https://carco1-production-a6e4.up.railway.app/api';
 
   ApiHelper(this.dio);
 
